@@ -1,14 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Greetings.Ports.Command;
 using Greetings.Ports.Events;
 using GreetingsSender.Web.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using GreetingsSender.Web.Models;
 using Paramore.Brighter;
+using Paramore.Brighter.Extensions.DependencyInjection;
 
 namespace GreetingsSender.Web.Controllers
 {
@@ -44,6 +45,19 @@ namespace GreetingsSender.Web.Controllers
             _commandProcessor.Post(greeting);
             await _commandProcessor.PostAsync(greetingAsync);
 
+            return View("Index");
+        }
+
+        [HttpGet("SaveMessageToDbAsync")]
+        public async Task<IActionResult> SaveMessageToDbAsync()
+        {
+            var greeting = new GreetingEvent("Hello Inside Process");
+
+            var command = new PutGreetingDirectIntoDbCommand(new Guid());
+            command.Greeting = greeting;
+
+            await _commandProcessor.SendAsync(command);
+            
             return View("Index");
         }
         
