@@ -35,6 +35,7 @@ using Paramore.Brighter.FeatureSwitch.Handlers;
 
 namespace Paramore.Brighter.Core.Tests.FeatureSwitch
 {
+    [Collection("CommandProcessor")]
     public class FeatureSwitchByConfigMissingConfigStrategySilentOnTests : IDisposable
     {
         private readonly MyCommand _myCommand = new MyCommand();
@@ -78,8 +79,7 @@ namespace Paramore.Brighter.Core.Tests.FeatureSwitch
 
         public void Dispose()
         {
-            _commandProcessor?.Dispose();
-            GC.SuppressFinalize(this);
+            CommandProcessor.ClearExtServiceBus();
         }
     }
 }
