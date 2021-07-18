@@ -65,10 +65,11 @@ namespace Paramore.Brighter.Extensions.DependencyInjection
 
             var outbox = provider.GetService<IAmAnOutbox<Message>>();
             var asyncOutbox = provider.GetService<IAmAnOutboxAsync<Message>>();
+            var overridingConnectionProvider = provider.GetService<IAmABoxConnectionProvider>();
 
             if (outbox == null) outbox = new InMemoryOutbox();
             if (asyncOutbox == null) asyncOutbox = new InMemoryOutbox();
-            
+
             var producer = provider.GetService<IAmAMessageProducer>();
             var asyncProducer = provider.GetService<IAmAMessageProducerAsync>();
 
@@ -87,7 +88,7 @@ namespace Paramore.Brighter.Extensions.DependencyInjection
             {
                 taskQueuesBuilder = producer == null
                     ? messagingBuilder.NoExternalBus()
-                    : messagingBuilder.ExternalBus(new MessagingConfiguration(producer, asyncProducer, messageMapperRegistry), outbox);
+                    : messagingBuilder.ExternalBus(new MessagingConfiguration(producer, asyncProducer, messageMapperRegistry), outbox, overridingConnectionProvider);
             }
             else
             {
@@ -102,7 +103,7 @@ namespace Paramore.Brighter.Extensions.DependencyInjection
                         ? messagingBuilder.RequestReplyQueues(new MessagingConfiguration(
                             producer, messageMapperRegistry,
                             responseChannelFactory: options.ChannelFactory))
-                        : messagingBuilder.ExternalBus(new MessagingConfiguration(producer, asyncProducer, messageMapperRegistry), outbox);
+                        : messagingBuilder.ExternalBus(new MessagingConfiguration(producer, asyncProducer, messageMapperRegistry), outbox, overridingConnectionProvider);
                 }
             }
 
